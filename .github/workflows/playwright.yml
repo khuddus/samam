@@ -9,15 +9,23 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
-      MONGODB_URI: ${{ secrets.MONGODB_URI }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-     
 
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+
+    - name: Set up MongoDB
+      uses: supercharge/mongodb-github-action@1.10.0
+      with:
+        mongodb-version: '5.0'  # Use the version you need
+        mongodb-port: 27017
+
+    - name: Set MONGODB_URI
+      run: echo "MONGODB_URI=mongodb://localhost:27017/test-db" >> $GITHUB_ENV
+
     - name: Install dependencies
       run: npm ci
 
@@ -25,14 +33,16 @@ jobs:
       run: npm run build
 
     - name: Start Application
-      run:  npm run start &
+      run: npm run start &
       env:
         CI: true
 
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
     - name: Run Playwright tests
       run: npx playwright test
+
     - uses: actions/upload-artifact@v4
       if: always()
       with:
