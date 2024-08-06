@@ -10,21 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      MONGODB_URI: ${{secrets.MONGODB_URI}}
 
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-
-    - name: Set up MongoDB
-      uses: supercharge/mongodb-github-action@1.10.0
-      with:
-        mongodb-version: '5.0'  # Use the version you need
-        mongodb-port: 27017
-
-    - name: Set MONGODB_URI
-      run: echo "MONGODB_URI=mongodb://localhost:27017/test-db" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: npm ci
